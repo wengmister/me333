@@ -44,14 +44,10 @@ On the other hand, double uses 8 bytes (64 bits) and provides about 15 decimal d
 c. char is an integer type, typically used to represent small integer values, with a range of -128 to 127 for signed char or 0 to 255 for unsigned char. It is highly memory-efficient, taking only 1 byte, making it a good choice for situations where memory is limited and the values fit within its range. However, char cannot represent fractional numbers and may require type promotion to int during arithmetic, which can negate some of its memory advantages.  
 On the other hand, float is a floating-point type used for representing real numbers (with decimals), but it is not designed for integer math. While float has a much wider range and can handle fractional values, it introduces potential precision issues due to its limited precision (about 7 decimal digits). float also takes 4 bytes of memory, which is significantly more than char. Using float for integer math can lead to unnecessary complexity and inefficiency since it’s primarily intended for continuous values and introduces rounding errors for integers. Therefore, for pure integer math, char is more appropriate.
 
-### 16. Technically the data type of a pointer to a double is “pointer to type double .” Of the common integer and floating point data types discussed in this chapter, which is the most similar to this pointer type? Assume pointers occupy eight bytes.
-The most similar data type to a pointer to a double (which is a "pointer to type double") among common integer and floating-point data types would be a void* (pointer to void).
+### 16. Technically the data type of a pointer to a double is “pointer to type double .” Of the common integer and floating point data types discussed in this chapter, which is the most similar to this pointer type? Assume pointers occupy eight bytes.  
+A pointer to a double is most similar to a pointer to a long int because both types typically occupy the same amount of memory and have similar alignment requirements on most systems. On a 64-bit architecture, pointers generally occupy 8 bytes, regardless of the data type they point to. However, the similarity lies in the size of the data they reference; both double and long int typically require 8 bytes of memory.  
 
-- Both a pointer to a double and a void* are used to store memory addresses (pointers), and both typically occupy 8 bytes on systems where pointers are 64 bits in size.
-- A void* is a generic pointer type that can point to any data type, while a pointer to a double specifically points to a double.
-- The primary similarity is in their role as pointers, with both types designed to hold addresses and typically requiring dereferencing to access the value they point to.
-
-While the actual type they point to differs (a double for the first and any data type for the second), in terms of memory layout and storage size (both 8 bytes on most systems), they are quite similar. This makes void* the closest match in terms of storage and pointer behavior among common types discussed in the chapter.
+Although double and long int differ in their usage—one being for floating-point operations and the other for integers—their shared size and alignment properties make their pointer types comparable.
 
 ### 17. The addresses have the following hexadecimal contents 
 (a) Initial state:
