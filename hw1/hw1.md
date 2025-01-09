@@ -2,8 +2,7 @@
 Author: Zhengyang Kris Weng
 
 ### 1. Install C, create the HelloWorld.c program, and compile and run it.
-
-
+Please see `HelloWorld.c` for more details
 
 ### 2. Explain what a pointer variable is, and how it is different from a non-pointer variable
 A pointer variable in programming is a special type of variable that stores the memory address of another variable rather than directly holding a value. Non-pointer variables operate on the actual value they hold, while pointer variables operate on references to values, making them fundamental in memory management and certain programming paradigms.
