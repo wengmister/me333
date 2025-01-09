@@ -27,7 +27,7 @@ There's a total of 524288 bits in the memory.
 ### 8. What is the range of values for an unsigned char , short , and double data type?
 unsigned char: 0 to 255;  
 short: -2^15 to 2^15-1 = -32768 to 32767;  
-double: -1.8 * 10^308 to 1.8 * 10^308;  
+double: -1.8 * 10^308 to 1.8 * 10^308 per IEEE 754;  （I know Kevin says +/-2^2048 in the video but I'm not convinced)
 
 ### 10. Explain the difference between unsigned and signed integers.
 Unsigned integers use all the available bits to represent only non-negative numbers, allowing a range from 0 to 2^n−1, where n is the number of bits. Signed integers use one bit (the most significant bit) to indicate the sign - 0 for positive and 1 for negative. The remaining n−1 bits represent the value. They are typically represented using two's complement for negative values, giving a range from −2^(n−1) to 2^(n−1)−1. 
