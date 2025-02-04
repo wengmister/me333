@@ -36,7 +36,7 @@ unsigned int SR04_read_raw(unsigned int timeout) {
     NU32DIP_WriteUART1("TRIG OFF\r\n");
     
     // Wait until ECHO is HIGH
-    while (ECHO == 0) {
+    while (ECHO != 1) {
         ;  // Do nothing
     }
     NU32DIP_WriteUART1("ECHO HIGH\r\n");
