@@ -20,6 +20,10 @@ void main() {
         // Send the formatted string to UART
         NU32DIP_WriteUART1(buffer);
         
-        delay_us(250000);  // Wait 250ms (4 times per second)
+        // Delay for 250ms
+        _CP0_SET_COUNT(0);
+        while(_CP0_GET_COUNT() < 5000000) {
+            ;  // Do nothing
+        }
     }
 }
