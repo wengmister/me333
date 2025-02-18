@@ -236,7 +236,7 @@ As soon as the interrupt exits, the hardware switches back to the original regis
 
 ### 9.  Edit Code Sample 6.3 so that each line correctly uses the “bits” forms of the SFRs. In other words, the left-hand sides of the statements should use a form similar to that used in step 5, except using INTCONbits, IPC0bits, and IEC0bits
 
-See `hw6q9.c` for more details.
+See `hw6q9.c` for more details.C
 
 ### 16. Modify Code Sample 6.2 so the USER button is debounced. How can you change the ISR so the LEDs do not flash if the falling edge comes at the beginning of a very brief, spurious down pulse? Verify that your solution works.
 

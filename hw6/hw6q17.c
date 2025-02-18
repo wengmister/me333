@@ -1,8 +1,8 @@
 #include "nu32dip.h"
 #include <stdio.h>
 
-// Define a debounce delay for the CP0 timer (20 ms)
-#define DEBOUNCE_TIME 800000   // (20 ms at 40 MHz core clock)
+// Define a debounce delay for the CP0 timer
+#define DEBOUNCE_TIME 800000
 // Define a debounce delay loop constant for the software delay (adjust as needed)
 #define DEBOUNCE_LOOP 50000
 
@@ -64,7 +64,7 @@ void __ISR(_EXTERNAL_0_VECTOR, IPL6AUTO) INT0ISR(void) {
         unsigned int t = _CP0_GET_COUNT();
         stopwatchState = WAITING;
         
-        // Compute elapsed time in seconds. (40e6 core ticks per second)
+        // Compute elapsed time in seconds. (24e6 core ticks per second)
         double seconds = t / 24000000.0;
         char msg[100];
         sprintf(msg, "%.3f seconds elapsed\r\n", seconds);
