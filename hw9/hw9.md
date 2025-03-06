@@ -5,4 +5,19 @@ Zhengyang Kris Weng Submission 03/05/2025
 ### 28.4.1.1 The ~~NU32~~pico2 communicates with the encoder counter by an SPI channel. Which SPI channel will you use? Which ~~NU32~~ pico 2 pins does it use?
 I'm using GP14 and GP15 on pico 2 to read the phases from the encoder. PIC then talks to the Pico 2 through UART 2.
 
-### 28.4.1.2 The NU32 reads the MAX9918 current sensor using an ADC input. Which ADC input will you use? Which NU32 pin is it?
+### 28.4.1.2 The ~~NU32~~PIC32 reads the ~~MAX9918~~INA219 current sensor using an ~~ADC input~~I2C. Which ~~ADC input~~I2C will you use? Which ~~NU32~~PIC32 pin is it?
+I'm using SDA1 and SCL1 on PIC to talk to INA219. These are pin17 (SCL1) and pin18 (SDA1).
+
+### 28.4.1.3 The ~~NU32~~PIC32 controls the DRV8835 H-bridge using a direction bit (a digital output) and PWM (an output compare and a timer). Which peripherals will you use, and which ~~NU32~~PIC32 pins?
+
+We can use RA0 for digital output, and OC1 Timer 2 for PWM
+
+### 28.4.1.4 Which timers will you use to implement the 200 Hz position control ISR and the 5 kHz current control ISR? What priorities will you use?
+
+I'm using timer 3 and timer 4 for the position control ISR and current control ISR respectively. Since current control loop is more time-critical, I'm planning on using priority 6 for current control, and priority 5 for position control.
+
+### 28.4.1.5 Based on your answers to these questions, and your understanding of the project, annotate the block diagram of Figure 27.7. Each block should clearly indicate which devices or peripherals perform the operation in the block, and each signal line should clearly indicate how the signal is carried from one block to the other. (After this step, there should be no question about the hardware involved in the project. The details of wiring the H-bridge, current sensor, and encoder are left to later.)
+
+### 28.4.1.6 Based on which circuit boards need to be connected to which pins of the ~~NU~~PIC32, and the connections of the circuit boards to the motor and encoder, sketch a proposed layout of the circuit boards relative to the ~~NU~~PIC32 so that wire crossing is approximately minimized. (Do not make a full circuit diagram at this time.)
+
+

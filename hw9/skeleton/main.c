@@ -1,23 +1,38 @@
 #include "nu32dip.h" // config bits, constants, funcs for startup and UART
 #include "encoder.h"
-
+#include "ina219.h"
 
 #define BUF_SIZE 200
+
 int main()
 {
     char buffer[BUF_SIZE];
     NU32DIP_Startup(); // cache on, min flash wait, interrupts on, LED/button init, UART init
-    NU32DIP_GREEN = 1;  // turn off the LEDs
+    NU32DIP_GREEN = 1; // turn off the LEDs
     NU32DIP_YELLOW = 1;
     __builtin_disable_interrupts();
     UART2_Startup();
+    INA219_Startup();
     __builtin_enable_interrupts();
     while (1)
     {
         NU32DIP_ReadUART1(buffer, BUF_SIZE); // we expect the next character to be a menu command
-        NU32DIP_YELLOW = 1;                    // clear the error LED
+        NU32DIP_YELLOW = 1;                  // clear the error LED
         switch (buffer[0])
         {
+        case 'a': // read current sensor adc ##NOT IMPLEMENTED##
+        {
+            NU32DIP_WriteUART1("Current sensor ADC is not implemented due to hardware change.");
+            break;
+        }
+        case 'b': // read current sensor mA;
+        {
+            float ma = INA219_read_current();
+            char m[50];
+            sprintf(m, "Current: %.2f mA\r\n", ma);
+            NU32DIP_WriteUART1(m);
+            break;
+        }
         case 'c': // read encoder count
         {
             WriteUART2("a");
@@ -27,8 +42,8 @@ int main()
             int p = get_encoder_count();
             sprintf(m, "%d\r\n", p);
             NU32DIP_WriteUART1(m);
+            break;
         }
-        break;
         case 'e': // reset encoder count
         {
             WriteUART2("b");
