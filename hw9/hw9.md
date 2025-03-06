@@ -21,3 +21,5 @@ I'm using timer 3 and timer 4 for the position control ISR and current control I
 ### 28.4.1.6 Based on which circuit boards need to be connected to which pins of the ~~NU~~PIC32, and the connections of the circuit boards to the motor and encoder, sketch a proposed layout of the circuit boards relative to the ~~NU~~PIC32 so that wire crossing is approximately minimized. (Do not make a full circuit diagram at this time.)
 
 
+### 28.4.9.8 Now that the PWM output appears to be working, it is time to wire up the DRV8835 H-bridge circuit, as discussed in Chapter 27.1.1, to the motor and the PIC32 outputs (Figure 28.8). Notice that the 15 m! resistor on the current-sense PCB is in series with the motor. Turn in a circuit diagram showing all connections of the H-bridge to the NU32, motor, and current sensor PCB. Vin O2A O1A GND Vcc GND ENA PHA MD OCx Rxx M
+e

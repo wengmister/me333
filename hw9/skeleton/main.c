@@ -4,6 +4,12 @@
 
 #define BUF_SIZE 200
 
+void phase_output(int phase)
+{
+
+}
+
+
 int main()
 {
     char buffer[BUF_SIZE];
@@ -13,7 +19,36 @@ int main()
     __builtin_disable_interrupts();
     UART2_Startup();
     INA219_Startup();
+
+    // Disable analog functionality on Port A and set RA0 as digital output
+    ANSELA = 0;  
+    TRISAbits.TRISA0 = 0;  
+
+    // Configure RB10 as a digital output for direction control.
+    TRISBbits.TRISB10 = 0;
+
+    // Map RA0 (RPA0) to OC1 for PWM output
+    RPA0Rbits.RPA0R = 0b0101;  
+
+    // Configure Timer3 for a 20kHz PWM frequency
+    T3CONbits.TCKPS = 0;        // Prescaler = 1
+    PR3 = NU32DIP_SYS_FREQ/20000 - 1;  // Set period for 20kHz (assuming NU32DIP_SYS_FREQ is defined)
+    TMR3 = 0;
+
+    // Configure OC1 for PWM mode using Timer3
+    OC1CONbits.OCTSEL = 1;      // Use Timer3 as the clock source for OC1
+    OC1CONbits.OCM = 0b110;     // PWM mode without fault pin
+    OC1R = PR3/2;             // Initialize at 50% duty cycle
+    OC1RS = PR3/2;
+    
+    // Turn on Timer3 and OC1
+    T3CONbits.ON = 1;
+    OC1CONbits.ON = 1;
+
     __builtin_enable_interrupts();
+
+
+    // Main Loop
     while (1)
     {
         NU32DIP_ReadUART1(buffer, BUF_SIZE); // we expect the next character to be a menu command
@@ -48,6 +83,36 @@ int main()
         {
             WriteUART2("b");
             NU32DIP_WriteUART1("Encoder count reset\r\n");
+            break;
+        }
+        case 'f': // set PWM (-100 to 100)
+        {
+            NU32DIP_WriteUART1("Enter PWM (-100 to 100): ");
+            char pwm_buffer[50];
+            int pwm;
+
+            NU32DIP_ReadUART1(pwm_buffer, BUF_SIZE); 
+            // get the pwm value
+            sscanf(pwm_buffer, "%d", &pwm);
+            if (pwm < -100 || pwm > 100)
+            {
+                NU32DIP_WriteUART1("Invalid PWM value\r\n");
+            }
+            else
+            {
+                char m[50];
+                sprintf(m, "Setting PWM to %d\r\n", pwm);
+                NU32DIP_WriteUART1(m);
+
+                if (pwm < 0) {
+                    LATBbits.LATB10 = 1;  // Negative direction
+                } else {
+                    LATBbits.LATB10 = 0;  // Positive (or zero) direction
+                }
+
+                int pwm_abs = abs(pwm);
+                OC1RS = (unsigned int)((pwm_abs / 100.0) * PR3);
+            }
             break;
         }
         case 'q':
