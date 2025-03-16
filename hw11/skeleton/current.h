@@ -14,5 +14,6 @@ typedef struct {
 void set_pwm(int p);
 void set_current_gains(float kp, float ki);
 CurrentGains get_current_gains();
+void sendITestDataToPython(float *refArray, float *actualArray, int length);
 
 #endif // CURRENT_H

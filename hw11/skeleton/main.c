@@ -81,7 +81,7 @@ int main()
         {
         case 'a': // read current sensor adc ##NOT IMPLEMENTED##
         {
-            NU32DIP_WriteUART1("Current sensor ADC is not implemented due to hardware change.");
+            NU32DIP_WriteUART1("Current sensor ADC is not implemented due to hardware change.\n");
             break;
         }
         case 'b': // read current sensor mA;
@@ -111,7 +111,7 @@ int main()
         }
         case 'f': // set PWM (-100 to 100)
         {
-            NU32DIP_WriteUART1("Enter PWM (-100 to 100): ");
+            NU32DIP_WriteUART1("Enter PWM (-100 to 100): \r\n");
             char pwm_buffer[50];
             int pwm;
 
@@ -134,7 +134,7 @@ int main()
         }
         case 'g': // set current gains
         {
-            NU32DIP_WriteUART1("Enter Kp: ");
+            // NU32DIP_WriteUART1("Enter Kp: \r\n");
             char kp_buffer[50];
             float kp;
 
@@ -142,7 +142,7 @@ int main()
             // get the kp value
             sscanf(kp_buffer, "%f", &kp);
 
-            NU32DIP_WriteUART1("Enter Ki: ");
+            // NU32DIP_WriteUART1("Enter Ki: \r\n");
             char ki_buffer[50];
             float ki;
 
@@ -151,7 +151,7 @@ int main()
             sscanf(ki_buffer, "%f", &ki);
 
             set_current_gains(kp, ki);
-            NU32DIP_WriteUART1("Current gains set\r\n");
+            // NU32DIP_WriteUART1("Current gains set\r\n");
             break;
         }
         case 'h': // get current gains
@@ -165,7 +165,7 @@ int main()
         case 'k':
         {
             set_mode(ITEST);
-            NU32DIP_WriteUART1("Current controller in ITEST mode\r\n");
+            // NU32DIP_WriteUART1("Current controller in ITEST mode\r\n");
             break;
         }
         case 'p': // unpower the motor
