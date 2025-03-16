@@ -1,10 +1,8 @@
 #include "current.h"
-#include "mode.h"
-#include "ina219.h"
 #include <stdio.h>
 
-static float Kp = 0.0;
-static float Ki = 0.0;  // default values
+static float Kp = 0.1;
+static float Ki = 0.04;  // default values
 static int pwm = 0;
 
 void set_pwm(int p)
@@ -106,8 +104,33 @@ void __ISR(_TIMER_4_VECTOR, IPL4SOFT) CurrentController(void)
             break;
         }
         case HOLD:
-            // implement current controller
+        {
+            int actualCurrent = INA219_read_current(); // read current in mA
+            // get position reference current
+            int posRefCurrent = get_pos_ref_current();
+
+            // PI Controller
+            int error = posRefCurrent - actualCurrent;
+            static int posIntegral = 0;
+            posIntegral += error;
+            pwm = (Kp * error) + (Ki * posIntegral);
+            if (pwm > 100)
+            {
+                pwm = 100; // upper bound
+            }
+            else if (pwm < -100)
+            {
+                pwm = -100; // lower bound
+            }
+            OC1RS = (PR3 + 1) * (abs(pwm) / 100.0); // Set PWM duty cycle
+
+            if (pwm < 0) {
+                LATBbits.LATB10 = 1;  // Negative direction
+            } else {
+                LATBbits.LATB10 = 0;  // Positive (or zero) direction
+            }
             break;
+        }
         case TRACK:
             // implement current controller
             break;

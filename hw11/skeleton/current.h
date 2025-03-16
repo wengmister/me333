@@ -3,7 +3,9 @@
 
 #include <xc.h> // processor SFR definitions
 #include <sys/attribs.h> // __ISR macro
-
+#include "mode.h"
+#include "position.h"
+#include "ina219.h"
 #include "nu32dip.h"
 
 typedef struct {

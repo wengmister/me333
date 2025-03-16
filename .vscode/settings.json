@@ -6,6 +6,7 @@
         "nu32dip.h": "c",
         "current.h": "c",
         "stdio.h": "c",
-        "position.h": "c"
+        "position.h": "c",
+        "encoder.h": "c"
     }
 }

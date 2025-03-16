@@ -39,7 +39,7 @@ void timer5_init()
     PR5 = NU32DIP_SYS_FREQ/256/200 - 1;  // Set period for 200Hz
     TMR5 = 0;                   // Initial TMR5 count is 0
     // Turn on Timer5
-    IPC5bits.T5IP = 3;          // Interrupt priority 3
+    IPC5bits.T5IP = 5;          // Interrupt priority 5
     IPC5bits.T5IS = 0;          // Subpriority 0
     IFS0bits.T5IF = 0;          // Clear interrupt flag
     IEC0bits.T5IE = 1;          // Enable interrupt
@@ -80,6 +80,7 @@ int main()
 
     timer3_init();
     timer4_init();
+    timer5_init();
 
     OC1_init();
 
@@ -118,6 +119,19 @@ int main()
             NU32DIP_WriteUART1(m);
             break;
         }
+        case 'd': // get encoder angle
+        {
+            // encoder has 334 lines, so 334*4 = 1336 counts per revolution
+            WriteUART2("a");
+            while(!get_encoder_flag()){}
+            set_encoder_flag(0);
+            char m[50];
+            int p = get_encoder_count();
+            float angle = (float)p/1336*360;
+            sprintf(m, "Angle: %.2f degrees\r\n", angle);
+            NU32DIP_WriteUART1(m);
+            break;              
+        } 
         case 'e': // reset encoder count
         {
             WriteUART2("b");
@@ -219,6 +233,23 @@ int main()
         {
             set_mode(ITEST);
             // NU32DIP_WriteUART1("Current controller in ITEST mode\r\n");
+            break;
+        }
+        case 'l': // go to angle
+        {
+            NU32DIP_WriteUART1("Enter angle: \r\n");
+            char angle_buffer[50];
+            float angle;
+
+            NU32DIP_ReadUART1(angle_buffer, BUF_SIZE); 
+            // get the angle value
+
+            sscanf(angle_buffer, "%f", &angle);
+
+
+            set_desired_angle(angle);
+            set_mode(HOLD);
+            NU32DIP_WriteUART1("Current controller in HOLD mode\r\n");
             break;
         }
         case 'p': // unpower the motor
