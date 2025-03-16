@@ -24,6 +24,10 @@ void timer4_init()
     PR4 = NU32DIP_SYS_FREQ/20000 - 1;  // Set period for 5kHz
     TMR4 = 0;                   // Initial TMR4 count is 0
     // Turn on Timer4
+    IPC4bits.T4IP = 4;          // Interrupt priority 6
+    IPC4bits.T4IS = 0;          // Subpriority 0
+    IFS0bits.T4IF = 0;          // Clear interrupt flag
+    IEC0bits.T4IE = 1;          // Enable interrupt
     T4CONbits.ON = 1;
 }
 
@@ -39,8 +43,8 @@ void OC1_init()
     // Configure OC1 for PWM mode using Timer3
     OC1CONbits.OCTSEL = 1;      // Use Timer3 as the clock source for OC1
     OC1CONbits.OCM = 0b110;     // PWM mode without fault pin
-    OC1R = PR3/2;             // Initialize at 50% duty cycle
-    OC1RS = PR3/2;
+    OC1R = 0;             // Initialize at 50% duty cycle
+    OC1RS = 0;
 
     // Turn on OC1
     OC1CONbits.ON = 1;
@@ -66,6 +70,7 @@ int main()
 
     __builtin_enable_interrupts();
 
+    NU32DIP_GREEN = 0; // turn on green LED
 
     // Main Loop
     while (1)
@@ -106,7 +111,6 @@ int main()
         }
         case 'f': // set PWM (-100 to 100)
         {
-            set_mode(PWM);
             NU32DIP_WriteUART1("Enter PWM (-100 to 100): ");
             char pwm_buffer[50];
             int pwm;
@@ -120,18 +124,11 @@ int main()
             }
             else
             {
-                char m[50];
-                sprintf(m, "Setting PWM to %d\r\n", pwm);
-                NU32DIP_WriteUART1(m);
-
-                if (pwm < 0) {
-                    LATBbits.LATB10 = 1;  // Negative direction
-                } else {
-                    LATBbits.LATB10 = 0;  // Positive (or zero) direction
-                }
-
-                int pwm_abs = abs(pwm);
-                OC1RS = (unsigned int)((pwm_abs / 100.0) * PR3);
+                char msg[50];
+                sprintf(msg, "Setting PWM to %d\r\n", pwm);
+                NU32DIP_WriteUART1(msg);
+                set_pwm(pwm);
+                set_mode(PWM);
             }
             break;
         }
@@ -165,9 +162,16 @@ int main()
             NU32DIP_WriteUART1(m);
             break;
         }
+        case 'k':
+        {
+            set_mode(ITEST);
+            NU32DIP_WriteUART1("Current controller in ITEST mode\r\n");
+            break;
+        }
         case 'p': // unpower the motor
         {
             set_mode(IDLE);
+            NU32DIP_WriteUART1("Motor unpowered\r\n");
             break;
         }
         case 'q':
