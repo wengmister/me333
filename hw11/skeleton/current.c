@@ -43,11 +43,6 @@ void sendITestDataToPython(float *refArray, float *actualArray, int length)
 
 void __ISR(_TIMER_4_VECTOR, IPL4SOFT) CurrentController(void)
 {
-    static int counter = 0;
-    static float reference_current = 200.0; // Initial reference current in mA
-    static float actual_current_array[100]; // Array to store actual current values
-    static float reference_current_array[100]; // Array to store reference current values
-
     Mode m = get_mode();
     switch (m)
     {
@@ -68,12 +63,16 @@ void __ISR(_TIMER_4_VECTOR, IPL4SOFT) CurrentController(void)
         }
         case ITEST:
         {
+            static int counter = 0;
+            static float reference_current = 200.0; // Initial reference current in mA
+            static float actual_current_array[100]; // Array to store actual current values
+            static float reference_current_array[100]; // Array to store reference current values
             // Toggle reference current every 25 ISR executions
             if (counter == 25 || counter == 50 || counter == 75) {
                 reference_current = -reference_current;
             }
 
-            // Read actual current from sensor (assuming a function read_current_mA() exists)
+            // Read actual current from sensor
             float current = INA219_read_current();
 
             // Save reference and actual current data

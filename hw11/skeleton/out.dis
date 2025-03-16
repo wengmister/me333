@@ -379,8 +379,8 @@ Disassembly of section .rodata:
 
 9d007490 <.rodata>:
 9d007490:	000a6425 	0xa6425
-9d007494:	25206425 	addiu	zero,t1,25637
-9d007498:	00000a64 	0xa64
+9d007494:	25206625 	addiu	zero,t1,26149
+9d007498:	00000a66 	0xa66
 	...
 9d0074a4:	40590000 	cfc0	t9,c0_index
 9d0074a8:	00006425 	0x6425
@@ -5565,7 +5565,7 @@ void sendITestDataToPython(float *refArray, float *actualArray, int length)
 9d00c0bc:	00129080 	sll	s2,s2,0x2
 9d00c0c0:	02328821 	addu	s1,s1,s2
     {
-        sprintf(buffer, "%d %d\n", refArray[i], actualArray[i]);
+        sprintf(buffer, "%f %f\n", refArray[i], actualArray[i]);
 9d00c0c4:	3c129d00 	lui	s2,0x9d00
 9d00c0c8:	26527494 	addiu	s2,s2,29844
 9d00c0cc:	0f4045c5 	jal	9d011714 <__extendsfdf2>
@@ -5644,11 +5644,6 @@ void __ISR(_TIMER_4_VECTOR, IPL4SOFT) CurrentController(void)
 9d00c1cc:	00001810 	mfhi	v1
 9d00c1d0:	afa30070 	sw	v1,112(sp)
 9d00c1d4:	03a0f025 	move	s8,sp
-    static int counter = 0;
-    static float reference_current = 200.0; // Initial reference current in mA
-    static float actual_current_array[100]; // Array to store actual current values
-    static float reference_current_array[100]; // Array to store reference current values
-
     Mode m = get_mode();
 9d00c1d8:	0f404d71 	jal	9d0135c4 <get_mode>
 9d00c1dc:	24110001 	li	s1,1

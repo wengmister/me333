@@ -3,31 +3,38 @@ import time
 import matplotlib.pyplot as plt
 from statistics import mean
 from genref import genRef
-
+import numpy as np
 
 def read_plot_matrix():
     n_str = ser.read_until(b'\n').decode('utf-8')  # get the number of data points to receive
     n_int = int(n_str)  # turn it into an int
     print('Data length = ' + str(n_int))
-    ref = []
-    data = []
-    data_received = 0
-    while data_received < n_int:
+    
+    data = []  # to store the reference and actual current values
+    times = []  # to store the time values
+    
+    for i in range(n_int):
         dat_str = ser.read_until(b'\n').decode('utf-8')  # get the data as a string, ints separated by spaces
-        dat_f = list(map(float, dat_str.split()))  # now the data is a list
-        ref.append(dat_f[0])
-        data.append(dat_f[1])
-        data_received += 1
-    meanzip = zip(ref, data)
-    meanlist = []
-    for i, j in meanzip:
-        meanlist.append(abs(i - j))
-    score = mean(meanlist)
-    t = range(len(ref))  # index array
-    plt.plot(t, ref, 'r*-', t, data, 'b*-')
-    plt.title('Score = ' + str(score))
-    plt.ylabel('value')
-    plt.xlabel('index')
+        dat_f = list(map(int, dat_str.split()))  # now the data is a list of ints
+        data.append(dat_f)
+        times.append(i * 0.2)  # 0.2 ms between samples
+    
+    data = np.array(data)  # convert to numpy array for easier manipulation
+    
+    if n_int > 1:
+        plt.step(times, data[:, 0], label='Reference Current', where='mid')
+        plt.step(times, data[:, 1], label='Actual Current', where='mid')
+        plt.legend()
+    else:
+        print('Only 1 sample received')
+        print(data)
+    
+    # compute the average error
+    score = mean(abs(data[:, 0] - data[:, 1]))
+    print(f'\nAverage error: {score:.1f} mA')
+    plt.title(f'Average error: {score:.1f} mA')
+    plt.ylabel('Current (mA)')
+    plt.xlabel('Time (ms)')
     plt.show()
 
 
