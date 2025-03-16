@@ -3,6 +3,7 @@
         "system_error": "c",
         "sr04.h": "c",
         "condition_variable": "c",
-        "nu32dip.h": "c"
+        "nu32dip.h": "c",
+        "current.h": "c"
     }
 }

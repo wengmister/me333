@@ -1,14 +1,10 @@
 #include "nu32dip.h" // config bits, constants, funcs for startup and UART
 #include "encoder.h"
 #include "ina219.h"
+#include "current.h"
+#include <stdio.h>
 
 #define BUF_SIZE 200
-
-void phase_output(int phase)
-{
-
-}
-
 
 int main()
 {
@@ -113,6 +109,36 @@ int main()
                 int pwm_abs = abs(pwm);
                 OC1RS = (unsigned int)((pwm_abs / 100.0) * PR3);
             }
+            break;
+        }
+        case 'g': // set current gains
+        {
+            NU32DIP_WriteUART1("Enter Kp: ");
+            char kp_buffer[50];
+            float kp;
+
+            NU32DIP_ReadUART1(kp_buffer, BUF_SIZE); 
+            // get the kp value
+            sscanf(kp_buffer, "%f", &kp);
+
+            NU32DIP_WriteUART1("Enter Ki: ");
+            char ki_buffer[50];
+            float ki;
+
+            NU32DIP_ReadUART1(ki_buffer, BUF_SIZE); 
+            // get the ki value
+            sscanf(ki_buffer, "%f", &ki);
+
+            set_current_gains(kp, ki);
+            NU32DIP_WriteUART1("Current gains set\r\n");
+            break;
+        }
+        case 'h': // get current gains
+        {
+            CurrentGains gains = get_current_gains();
+            char m[50];
+            sprintf(m, "Kp: %.2f, Ki: %.2f\r\n", gains.Kp, gains.Ki);
+            NU32DIP_WriteUART1(m);
             break;
         }
         case 'q':
