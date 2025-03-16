@@ -3,6 +3,7 @@
 #include "ina219.h"
 #include "current.h"
 #include "mode.h"
+#include "position.h"
 #include <stdio.h>
 
 #define BUF_SIZE 200
@@ -24,11 +25,25 @@ void timer4_init()
     PR4 = NU32DIP_SYS_FREQ/20000 - 1;  // Set period for 5kHz
     TMR4 = 0;                   // Initial TMR4 count is 0
     // Turn on Timer4
-    IPC4bits.T4IP = 4;          // Interrupt priority 6
+    IPC4bits.T4IP = 4;          // Interrupt priority 4
     IPC4bits.T4IS = 0;          // Subpriority 0
     IFS0bits.T4IF = 0;          // Clear interrupt flag
     IEC0bits.T4IE = 1;          // Enable interrupt
     T4CONbits.ON = 1;
+}
+
+void timer5_init()
+{
+    // Configure Timer 5 for a 200Hz position ISR frequency
+    T5CONbits.TCKPS = 7;        // Prescaler = 256
+    PR5 = NU32DIP_SYS_FREQ/256/200 - 1;  // Set period for 200Hz
+    TMR5 = 0;                   // Initial TMR5 count is 0
+    // Turn on Timer5
+    IPC5bits.T5IP = 3;          // Interrupt priority 3
+    IPC5bits.T5IS = 0;          // Subpriority 0
+    IFS0bits.T5IF = 0;          // Clear interrupt flag
+    IEC0bits.T5IE = 1;          // Enable interrupt
+    T5CONbits.ON = 1;
 }
 
 void OC1_init()
@@ -159,6 +174,44 @@ int main()
             CurrentGains gains = get_current_gains();
             char m[50];
             sprintf(m, "Kp: %.2f, Ki: %.2f\r\n", gains.Kp, gains.Ki);
+            NU32DIP_WriteUART1(m);
+            break;
+        }
+        case 'i': // set position gains
+        {
+            // NU32DIP_WriteUART1("Enter Kp: \r\n");
+            char kp_buffer[50];
+            float kp;
+
+            NU32DIP_ReadUART1(kp_buffer, BUF_SIZE); 
+            // get the kp value
+            sscanf(kp_buffer, "%f", &kp);
+
+            // NU32DIP_WriteUART1("Enter Ki: \r\n");
+            char ki_buffer[50];
+            float ki;
+
+            NU32DIP_ReadUART1(ki_buffer, BUF_SIZE); 
+            // get the ki value
+            sscanf(ki_buffer, "%f", &ki);
+
+            // NU32DIP_WriteUART1("Enter Kd: \r\n");
+            char kd_buffer[50];
+            float kd;
+
+            NU32DIP_ReadUART1(kd_buffer, BUF_SIZE); 
+            // get the kd value
+            sscanf(kd_buffer, "%f", &kd);
+
+            set_position_gains(kp, ki, kd);
+            // NU32DIP_WriteUART1("Position gains set\r\n");
+            break;
+        }
+        case 'j':
+        {
+            PositionGains gains = get_position_gains();
+            char m[50];
+            sprintf(m, "Kp: %.2f, Ki: %.2f, Kd: %.2f \r\n", gains.Kp, gains.Ki, gains.Kd);
             NU32DIP_WriteUART1(m);
             break;
         }

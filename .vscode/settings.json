@@ -4,6 +4,8 @@
         "sr04.h": "c",
         "condition_variable": "c",
         "nu32dip.h": "c",
-        "current.h": "c"
+        "current.h": "c",
+        "stdio.h": "c",
+        "position.h": "c"
     }
 }

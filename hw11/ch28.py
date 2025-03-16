@@ -146,17 +146,20 @@ while not has_quit:
     elif selection == 'i':  # set position gains
         n1_str = input('Enter kp_deg: ')  # get the number to send
         n1_flt = float(n1_str)  # turn it into a float
+        ser.write((str(n1_flt) + "\n").encode())  # send the number
+        ser.flush()  # Ensure the command is sent immediately
         n2_str = input('Enter ki_deg: ')  # get the second number
         n2_flt = float(n2_str)  # convert it to a float
+        ser.write((str(n2_flt) + "\n").encode())  # send the number
+        ser.flush()  # Ensure the command is sent immediately
         n3_str = input('Enter kd_deg: ')  # get the third number
         n3_flt = float(n3_str)  # convert it to a float
-        combined_str = f"{n1_flt} {n2_flt} {n3_flt}\n"  # Combine the three numbers into a single string
-        ser.write(combined_str.encode())  # send the number
+        ser.write((str(n3_flt) + "\n").encode())  # send the number
         ser.flush()  # Ensure the command is sent immediately
         print(f'Set kp_deg to: {n1_flt}, ki_deg to: {n2_flt}, kd_deg to: {n3_flt}')
     elif selection == 'j':  # get position gains
         n_str = ser.read_until(b'\n').decode('utf-8')
-        print('Got back kp_deg, ki_deg, kd_deg: ', n_str[0:-2])
+        print('Got back kp_deg, ki_deg, kd_deg: ', n_str)
     elif selection == 'k':  # test current control
         read_plot_matrix()
     elif selection == 'l':  # go to angle (deg)
