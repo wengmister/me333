@@ -36,7 +36,7 @@ void sendITestDataToPython(float *refArray, float *actualArray, int length)
     // Send the reference then the actual current data
     for (int i = 0; i < length; i++)
     {
-        sprintf(buffer, "%d %d\n", refArray[i], actualArray[i]);
+        sprintf(buffer, "%f %f\n", refArray[i], actualArray[i]);
         NU32DIP_WriteUART1(buffer);
     }
 }

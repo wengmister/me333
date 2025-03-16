@@ -15,7 +15,7 @@ def read_plot_matrix():
     
     for i in range(n_int):
         dat_str = ser.read_until(b'\n').decode('utf-8')  # get the data as a string, ints separated by spaces
-        dat_f = list(map(int, dat_str.split()))  # now the data is a list of ints
+        dat_f = list(map(float, dat_str.split()))  # now the data is a list of ints
         data.append(dat_f)
         times.append(i * 0.2)  # 0.2 ms between samples
     
@@ -24,7 +24,7 @@ def read_plot_matrix():
     if n_int > 1:
         plt.step(times, data[:, 0], label='Reference Current', where='mid')
         plt.step(times, data[:, 1], label='Actual Current', where='mid')
-        plt.legend()
+        plt.legend(loc='upper right')
     else:
         print('Only 1 sample received')
         print(data)
@@ -36,7 +36,6 @@ def read_plot_matrix():
     plt.ylabel('Current (mA)')
     plt.xlabel('Time (ms)')
     plt.show()
-
 
 def read_plot_position_matrix():
     n_str = ser.read_until(b'\n').decode('utf-8')  # get the number of data points to receive
