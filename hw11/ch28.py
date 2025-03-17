@@ -193,7 +193,9 @@ while not has_quit:
             ser.write((str(i) + '\n').encode())
             ser.flush()  # Ensure the command is sent immediately
     elif selection == 'o':  # execute trajectory
-        read_plot_matrix()
+        pass
+        # read_plot_matrix()
+        
     elif selection == 'p':  # unpowered the motor
         print('Unpowered Motor.')
     elif selection == 'q':  # quit

@@ -141,8 +141,39 @@ void __ISR(_TIMER_4_VECTOR, IPL4SOFT) CurrentController(void)
             break;
         }
         case TRACK:
-            // implement current controller
+        {
+            int current = INA219_read_current(); // read current in mA
+            // get position reference current
+            int reference_current = get_pos_ref_current();
+
+            // PI controller
+            float error = reference_current - current;
+            static float integral = 0.0;
+            integral += error;
+            // Add integral windup protection
+            if (integral > 1000) integral = 1000;
+            if (integral < -1000) integral = -1000;
+            float control_signal = Kp * error + Ki * integral;
+            if (control_signal > 100)
+            {
+                control_signal = 100; // upper bound
+            }
+            else if (control_signal < -100)
+            {
+                control_signal = -100; // lower bound
+            }
+
+            // Corrected direction control logic
+            if (control_signal < 0) {
+                LATBbits.LATB10 = 1;  // Negative direction
+                control_signal = -control_signal;
+            } else {
+                LATBbits.LATB10 = 0;  // Positive direction
+            }
+
+            OC1RS = (unsigned int)((control_signal / 100.0) * PR3);
             break;
+        }
         default:
             break;
     }

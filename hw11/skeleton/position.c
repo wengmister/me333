@@ -10,6 +10,7 @@ static float pos_ref_current = 0.0;
 
 #define MAX_TRAJECTORY_POINTS 1000  // Define a maximum size for the trajectory array
 static float trajectory[MAX_TRAJECTORY_POINTS];
+static float tracked_trajectory[MAX_TRAJECTORY_POINTS];
 static int trajectory_length = 0;
 
 void set_trajectory(float *traj, int length)
@@ -120,9 +121,9 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) PositionController(void)
             static int previous_error = 0;
             static int integral = 0;
             float actual_angle = get_current_angle();
-            trackActualAngle[trajCounter] = (float)actual_angle;
+            tracked_trajectory[traj_counter] = (float)actual_angle;
             // PID Controller
-            int error = trackRefAngle[traj_counter] - actual_angle;
+            int error = trajectory[traj_counter] - actual_angle;
                         // calculate the integral term
             integral += error;
             // Add integral windup protection
@@ -142,10 +143,10 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) PositionController(void)
             pos_ref_current = control_effort;
             previous_error = error;
 
-            trajCounter++;
-            if (trajCounter >= trajLength)
+            traj_counter++;
+            if (traj_counter >= MAX_TRAJECTORY_POINTS)
             {
-                desired_angle = trackRefAngle[traj_counter - 1];
+                // desired_angle = trajectory[traj_counter - 1];
                 previous_error = 0;
                 integral = 0;
                 traj_counter = 0;
