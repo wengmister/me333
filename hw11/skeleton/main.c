@@ -8,6 +8,8 @@
 
 #define BUF_SIZE 200
 
+volatile int trajLength = 0;
+
 void timer3_init()
 {
     // Configure Timer3 for a 20kHz PWM frequency
@@ -254,24 +256,41 @@ int main()
         }
         case 'm': // load step trajectory
         {
-            NU32DIP_WriteUART1("Enter the number of samples: \r\n");
             char num_samples_buffer[BUF_SIZE];
             int num_samples;
 
             NU32DIP_ReadUART1(num_samples_buffer, BUF_SIZE);
             sscanf(num_samples_buffer, "%d", &num_samples);
-
             float trajectory[num_samples];
             for (int i = 0; i < num_samples; i++) {
                 char sample_buffer[BUF_SIZE];
                 NU32DIP_ReadUART1(sample_buffer, BUF_SIZE);
                 sscanf(sample_buffer, "%f", &trajectory[i]);
             }
-
             // Store the trajectory and switch to TRACK mode
             set_trajectory(trajectory, num_samples);
+            break;
+        }
+        case 'n': // load cubic trajectory
+        {
+            char num_samples_buffer[BUF_SIZE];
+            int num_samples;
+
+            NU32DIP_ReadUART1(num_samples_buffer, BUF_SIZE);
+            sscanf(num_samples_buffer, "%d", &num_samples);
+            float trajectory[num_samples];
+            for (int i = 0; i < num_samples; i++) {
+                char sample_buffer[BUF_SIZE];
+                NU32DIP_ReadUART1(sample_buffer, BUF_SIZE);
+                sscanf(sample_buffer, "%f", &trajectory[i]);
+            }
+            // Store the trajectory and switch to TRACK mode
+            set_trajectory(trajectory, num_samples);
+            break;
+        }
+        case 'o': // start trajectory
+        {
             set_mode(TRACK);
-            NU32DIP_WriteUART1("Current controller in TRACK mode\r\n");
             break;
         }
         case 'p': // unpower the motor

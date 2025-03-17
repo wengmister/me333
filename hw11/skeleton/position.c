@@ -8,16 +8,21 @@ static float kdp = 75.0;  // default values
 static float position = 0.0;
 static float pos_ref_current = 0.0;
 
-static float trajectory[1000]; // Adjust size as needed
+#define MAX_TRAJECTORY_POINTS 1000  // Define a maximum size for the trajectory array
+static float trajectory[MAX_TRAJECTORY_POINTS];
 static int trajectory_length = 0;
 
 void set_trajectory(float *traj, int length)
 {
+    if (length > MAX_TRAJECTORY_POINTS) {
+        length = MAX_TRAJECTORY_POINTS;  // Ensure we do not exceed the array size
+    }
     trajectory_length = length;
     for (int i = 0; i < length; i++) {
         trajectory[i] = traj[i];
     }
 }
+
 
 float get_trajectory_point(int index)
 {
@@ -111,14 +116,42 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) PositionController(void)
         }
         case TRACK:
         {
-            if (trajectory_index < trajectory_length) {
-                position = get_trajectory_point(trajectory_index);
-                trajectory_index++;
-            } else {
-                set_mode(IDLE); // End of trajectory
-                trajectory_index = 0;
+            static int traj_counter = 0;
+            static int previous_error = 0;
+            static int integral = 0;
+            float actual_angle = get_current_angle();
+            trackActualAngle[trajCounter] = (float)actual_angle;
+            // PID Controller
+            int error = trackRefAngle[traj_counter] - actual_angle;
+                        // calculate the integral term
+            integral += error;
+            // Add integral windup protection
+            if (integral > 1000) integral = 1000;
+            if (integral < -1000) integral = -1000;
+
+            // calculate the derivative term
+            float derivative = error - previous_error;
+
+            // calculate the control effort with PID
+            float control_effort = kpp * error + kip * integral + kdp * derivative;
+
+            // update the previous error
+            previous_error = error;
+
+            // set the control effort
+            pos_ref_current = control_effort;
+            previous_error = error;
+
+            trajCounter++;
+            if (trajCounter >= trajLength)
+            {
+                desired_angle = trackRefAngle[traj_counter - 1];
+                previous_error = 0;
+                integral = 0;
+                traj_counter = 0;
+                set_mode(IDLE);
+                // sendTrackDataToPython(trackRefAngle, trackActualAngle, trajLength);
             }
-            break;
         }
         default:
             break;
