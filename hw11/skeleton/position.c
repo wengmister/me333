@@ -24,16 +24,20 @@ void set_trajectory(float *traj, int length)
     }
 }
 
-
-float get_trajectory_point(int index)
+void sendTrackData(float *refArray, float *actualArray, int length)
 {
-    if (index < trajectory_length) {
-        return trajectory[index];
-    } else {
-        return 0.0; // Return 0 if index is out of bounds
+    char buffer[MAX_TRAJECTORY_POINTS];
+    // Send the number of data points
+    sprintf(buffer, "%i\n", length);
+    NU32DIP_WriteUART1(buffer);
+
+    // Send the reference then the actual current data
+    for (int i = 0; i < length; i++)
+    {
+        sprintf(buffer, "%f %f\n", refArray[i], actualArray[i]);
+        NU32DIP_WriteUART1(buffer);
     }
 }
-
 void set_desired_angle(float angle)
 {
     position = angle;
@@ -146,12 +150,12 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) PositionController(void)
             traj_counter++;
             if (traj_counter >= MAX_TRAJECTORY_POINTS)
             {
-                // desired_angle = trajectory[traj_counter - 1];
+                position = trajectory[traj_counter - 1];
                 previous_error = 0;
                 integral = 0;
                 traj_counter = 0;
-                set_mode(IDLE);
-                // sendTrackDataToPython(trackRefAngle, trackActualAngle, trajLength);
+                sendTrackData(trajectory, tracked_trajectory, MAX_TRAJECTORY_POINTS);
+                set_mode(HOLD);
             }
         }
         default:

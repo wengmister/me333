@@ -38,33 +38,43 @@ def read_plot_matrix():
     plt.show()
 
 def read_plot_position_matrix():
-    n_str = ser.read_until(b'\n').decode('utf-8')  # get the number of data points to receive
-    n_int = int(n_str)  # turn it into an int
+    while True:
+        n_str = ser.read_until(b'\n').decode('utf-8').strip()  # get the number of data points to receive
+        if n_str:
+            try:
+                n_int = int(n_str)  # turn it into an int
+                break
+            except ValueError:
+                print(f"Received invalid data for number of samples: '{n_str}'")
+        else:
+            print("Received empty data for number of samples")
+    
     print('Data length = ' + str(n_int))
     # Lists to store the four values from each line
-    refCur = []
     refAngle = []
-    actualCur = []
     actualAng = []
     data_received = 0
     while data_received < n_int:
-        dat_str = ser.read_until(b'\n').decode('utf-8')  # get the data as a string, ints separated by spaces
-        dat_f = list(map(float, dat_str.split()))  # now the data is a list of floats
-        # Ensure there are exactly four numbers in the line
-        if len(dat_f) == 4:
-            refCur.append(dat_f[0])
-            refAngle.append(dat_f[1])
-            actualCur.append(dat_f[2])
-            actualAng.append(dat_f[3])
-            data_received += 1
+        dat_str = ser.read_until(b'\n').decode('utf-8').strip()  # get the data as a string, ints separated by spaces
+        if dat_str:
+            try:
+                dat_f = list(map(float, dat_str.split()))  # now the data is a list of floats
+                # Ensure there are exactly four numbers in the line
+                if len(dat_f) == 2:
+                    refAngle.append(dat_f[0])
+                    actualAng.append(dat_f[1])
+                    data_received += 1
+                else:
+                    print(f"Skipping malformed line: {dat_str}")
+            except ValueError:
+                print(f"Received invalid data: '{dat_str}'")
         else:
-            print(f"Skipping malformed line: {dat_str}")
+            print("Received empty data for sample")
+    
     # Plotting
-    t = range(len(refCur))  # index array
-    plt.plot(t, refCur, 'r*-', label='Reference Current')
-    plt.plot(t, actualCur, 'b*-', label='Actual Current')
-    plt.plot(t, refAngle, 'g*-', label='Reference Angle')
-    plt.plot(t, actualAng, 'y*-', label='Actual Angle')
+    t = range(len(refAngle))  # index array
+    plt.plot(t, refAngle, 'b*-', label='Reference Angle')  # Blue line with star markers
+    plt.plot(t, actualAng, '*-', color='orange', label='Actual Angle')  # Orange line with star markers
     plt.ylabel('Value (mA or deg)')
     plt.xlabel('Index')
     plt.legend()
@@ -193,9 +203,7 @@ while not has_quit:
             ser.write((str(i) + '\n').encode())
             ser.flush()  # Ensure the command is sent immediately
     elif selection == 'o':  # execute trajectory
-        pass
-        # read_plot_matrix()
-        
+        read_plot_position_matrix()
     elif selection == 'p':  # unpowered the motor
         print('Unpowered Motor.')
     elif selection == 'q':  # quit

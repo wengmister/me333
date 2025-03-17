@@ -24,7 +24,7 @@ CurrentGains get_current_gains()
     return gains;
 }
 
-void sendITestDataToPython(float *refArray, float *actualArray, int length)
+void sendITestData(float *refArray, float *actualArray, int length)
 {
     char buffer[100];
     // Send the number of data points
@@ -100,7 +100,7 @@ void __ISR(_TIMER_4_VECTOR, IPL4SOFT) CurrentController(void)
             if (counter >= 100) // End ITEST mode after 100 samples (two full cycles)
             {
                 set_mode(IDLE);
-                sendITestDataToPython(reference_current_array, actual_current_array, 100);
+                sendITestData(reference_current_array, actual_current_array, 100);
                 counter = 0;  // Reset counter
                 integral = 0; // Reset integral
             }
