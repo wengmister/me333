@@ -15,6 +15,8 @@ typedef struct {
     float Kd;
 } PositionGains;
 
+void set_trajectory(float *traj, int length)
+float get_trajectory_point(int index)
 
 void set_position_gains(float kp, float ki, float kd);
 PositionGains get_position_gains();

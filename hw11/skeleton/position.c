@@ -8,12 +8,32 @@ static float kdp = 75.0;  // default values
 static float position = 0.0;
 static float pos_ref_current = 0.0;
 
+static float trajectory[1000]; // Adjust size as needed
+static int trajectory_length = 0;
+
+void set_trajectory(float *traj, int length)
+{
+    trajectory_length = length;
+    for (int i = 0; i < length; i++) {
+        trajectory[i] = traj[i];
+    }
+}
+
+float get_trajectory_point(int index)
+{
+    if (index < trajectory_length) {
+        return trajectory[index];
+    } else {
+        return 0.0; // Return 0 if index is out of bounds
+    }
+}
+
 void set_desired_angle(float angle)
 {
     position = angle;
-    char m[50];
-    sprintf(m, "Desired angle: %.2f \r\n", position);
-    NU32DIP_WriteUART1(m);
+    // char m[50];
+    // sprintf(m, "Desired angle: %.2f \r\n", position);
+    // NU32DIP_WriteUART1(m);
 }
 
 float get_current_angle()
@@ -24,9 +44,9 @@ float get_current_angle()
     set_encoder_flag(0);
     int p = get_encoder_count();
     float angle = (float)p/1336*360;
-    char m[50];
-    sprintf(m, "Current angle: %.2f \r\n", angle);
-    NU32DIP_WriteUART1(m);
+    // char m[50];
+    // sprintf(m, "Current angle: %.2f \r\n", angle);
+    // NU32DIP_WriteUART1(m);
     return angle;
 }
 
@@ -87,6 +107,17 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) PositionController(void)
 
             // set the control effort
             pos_ref_current = control_effort;
+            break;
+        }
+        case TRACK:
+        {
+            if (trajectory_index < trajectory_length) {
+                position = get_trajectory_point(trajectory_index);
+                trajectory_index++;
+            } else {
+                set_mode(IDLE); // End of trajectory
+                trajectory_index = 0;
+            }
             break;
         }
         default:

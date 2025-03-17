@@ -7,6 +7,7 @@
         "current.h": "c",
         "stdio.h": "c",
         "position.h": "c",
-        "encoder.h": "c"
+        "encoder.h": "c",
+        "sstream": "c"
     }
 }

@@ -252,6 +252,28 @@ int main()
             NU32DIP_WriteUART1("Current controller in HOLD mode\r\n");
             break;
         }
+        case 'm': // load step trajectory
+        {
+            NU32DIP_WriteUART1("Enter the number of samples: \r\n");
+            char num_samples_buffer[BUF_SIZE];
+            int num_samples;
+
+            NU32DIP_ReadUART1(num_samples_buffer, BUF_SIZE);
+            sscanf(num_samples_buffer, "%d", &num_samples);
+
+            float trajectory[num_samples];
+            for (int i = 0; i < num_samples; i++) {
+                char sample_buffer[BUF_SIZE];
+                NU32DIP_ReadUART1(sample_buffer, BUF_SIZE);
+                sscanf(sample_buffer, "%f", &trajectory[i]);
+            }
+
+            // Store the trajectory and switch to TRACK mode
+            set_trajectory(trajectory, num_samples);
+            set_mode(TRACK);
+            NU32DIP_WriteUART1("Current controller in TRACK mode\r\n");
+            break;
+        }
         case 'p': // unpower the motor
         {
             set_mode(IDLE);
