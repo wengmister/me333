@@ -81,6 +81,9 @@ void __ISR(_TIMER_4_VECTOR, IPL4SOFT) CurrentController(void)
             float error = reference_current - current;
             static float integral = 0.0;
             integral += error;
+            // Add integral windup protection
+            if (integral > 1000) integral = 1000;
+            if (integral < -1000) integral = -1000;
             float control_signal = Kp * error + Ki * integral;
 
             // Set PWM and direction based on control signal
@@ -105,30 +108,36 @@ void __ISR(_TIMER_4_VECTOR, IPL4SOFT) CurrentController(void)
         }
         case HOLD:
         {
-            int actualCurrent = INA219_read_current(); // read current in mA
+            int current = INA219_read_current(); // read current in mA
             // get position reference current
-            int posRefCurrent = get_pos_ref_current();
+            int reference_current = get_pos_ref_current();
 
-            // PI Controller
-            int error = posRefCurrent - actualCurrent;
-            static int posIntegral = 0;
-            posIntegral += error;
-            pwm = (Kp * error) + (Ki * posIntegral);
-            if (pwm > 100)
+            // PI controller
+            float error = reference_current - current;
+            static float integral = 0.0;
+            integral += error;
+            // Add integral windup protection
+            if (integral > 1000) integral = 1000;
+            if (integral < -1000) integral = -1000;
+            float control_signal = Kp * error + Ki * integral;
+            if (control_signal > 100)
             {
-                pwm = 100; // upper bound
+                control_signal = 100; // upper bound
             }
-            else if (pwm < -100)
+            else if (control_signal < -100)
             {
-                pwm = -100; // lower bound
+                control_signal = -100; // lower bound
             }
-            OC1RS = (PR3 + 1) * (abs(pwm) / 100.0); // Set PWM duty cycle
 
-            if (pwm < 0) {
+            // Corrected direction control logic
+            if (control_signal < 0) {
                 LATBbits.LATB10 = 1;  // Negative direction
+                control_signal = -control_signal;
             } else {
-                LATBbits.LATB10 = 0;  // Positive (or zero) direction
+                LATBbits.LATB10 = 0;  // Positive direction
             }
+
+            OC1RS = (unsigned int)((control_signal / 100.0) * PR3);
             break;
         }
         case TRACK:
